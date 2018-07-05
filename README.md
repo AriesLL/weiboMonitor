@@ -1,8 +1,11 @@
  weiboMonitor
 
 reference: https://blog.csdn.net/acsyl/article/details/78189042
-prerequisite
+
+prerequisite:
+
 pip install requests
+
 pip install bs4 
 
 python 3
