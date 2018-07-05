@@ -13,8 +13,11 @@ python ./listUrl_new.py test_input.txt test_output.txt 2 5
 
 
 input file, specify the monitored weibo id, for example, https://weibo.cn/repost/GmUmH32r2 is the one for test_input.txt
+
 output file, specify the output .txt file name (has to be .txt extension, need to be changed）
+
 start_postition, start page number of the repost, 
+
 batch_number, specify how many pages to crawl
 
 so this command is to 
