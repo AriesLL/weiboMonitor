@@ -28,7 +28,6 @@ def getUrlList(url, start_pos):
     url = comment_page + url
     # print("debug url: "+url)
     html = requests.get(url, cookies=cook).content
-    # print("debug ==========:")
     # print(html)
 
     soup = BeautifulSoup(html, "html.parser")
@@ -38,17 +37,14 @@ def getUrlList(url, start_pos):
     b = a[0:len(a) - 1]  # 页面的第一部分
     c = form.find("div").text.split("/")[1]
     d = len(c) - 1
-    e = c[0:d]
-    if (int(e) + 1 <= start_pos + batchNum):
-        end_pos = int(e) + 1
+    e = c[0:d]  # Maximum page
+    if (int(e) + 1 <= start_pos + (batchNum * 1000)):
+        totalbatch = int((int(e) - start_pos) / 1000)
     else:
-        end_pos = start_pos + batchNum
-
-    # for i in range(1,int(e) + 1):
-    for i in range(start_pos, end_pos):
-        # if (i >= start_pos) and (i <= (start_pos+2)) :
-        list.append(page + b + str(i))
-        # print("debug list:"+ page +b + str(i))
+        totalbatch = batchNum
+    for i in range(0, totalbatch):
+        num = start_pos + i * 1000
+        list.append(page + b + str(num))
     return list
 
 
@@ -65,23 +61,8 @@ def getComment(url, file):
         r = soup.findAll('div', attrs={"class": "c"})
         counter = 0
         for e in r:
-            size = 0
-            name = ''
-            uid = ''
-            article = ''
-            for item in e.find_all('a', href=re.compile("/u")):
-                size = size + 1
-                name = item.text
-                uid = item.get('href').split("/")[2]
-                # print("detail")
-                # print(name)
-            for item in e.find_all('span', attrs={"class": "cc"}):
-                size = size + 1
-                str = item.find('a').get("href").split("/")
-                article = str[2]
-                # print("detail")
-                # print(article)
             for item in e.find_all('span', attrs={"class": "ct"}):
+                counter += 1
                 repo_info = item.text
                 repo_date = re.findall("\d+月\d+日", repo_info)
                 repo_time = re.findall("\d+:\d+", repo_info)
@@ -94,36 +75,66 @@ def getComment(url, file):
                     repo_time = repo_time[0]
                 else:
                     repo_time = ""
-                # print(repo_date+repo_time)
+                # print(repo_date + repo_time)
                 date_time = repo_date + repo_time
 
-            if size == 2:
-                repostText = (e.text)
-
-                repostText = (repostText.replace(',', 'delimiterTag'))
-                # print(repostText)
-
-                # else:
-                #    repostText=""
-                # print(repostText)
-                counter += 1
                 try:
                     # file.write(link + '\n')
-                    file.write("{},{},{},{}\n".format(
-                        date_time,
-                        uid,
-                        name,
-                        repostText
+                    file.write("{}\n".format(
+                        date_time
                     ))
 
                 except IOError:
                     print("存入目标文件有误，请重新选择文件")
                     raise IOError("存入目标文件有误，请重新选择文件")
+        print("==== Total Lines: {}".format(counter))
+    except Exception as err:
+        print("**********Connection Request Failed**********")
+        print('Failed to upload to ftp: {}'.format(err))
+        raise Exception()
 
-                # print("detail")
-                # print(item)
-                # print(item.text)
-        print("Total Lines: {}".format(counter))
+
+def getFirstCommentTime(url, file, pageNum):
+    """
+     获取单个链接页面中的首条时间
+    """
+    try:
+        html = requests.get(url, cookies=cook).content
+        # print(html)
+        soup = BeautifulSoup(html, "html.parser")
+        r = soup.findAll('div', attrs={"class": "c"})
+        counter = 0
+        for e in r:
+            for item in e.find_all('span', attrs={"class": "ct"}):
+                counter += 1
+                repo_info = item.text
+                repo_date = re.findall("\d+月\d+日", repo_info)
+                repo_time = re.findall("\d+:\d+", repo_info)
+                if len(repo_date) != 0:
+                    repo_date = repo_date[0]
+                else:
+                    repo_date = ""
+
+                if len(repo_time) != 0:
+                    repo_time = repo_time[0]
+                else:
+                    repo_time = ""
+                # print(repo_date + repo_time)
+                date_time = repo_date + repo_time
+
+                try:
+                    # file.write(link + '\n')
+                    file.write("[{}] {}\n".format(
+                        date_time,
+                        pageNum
+                    ))
+
+                except IOError:
+                    print("存入目标文件有误，请重新选择文件")
+                    raise IOError("存入目标文件有误，请重新选择文件")
+            if counter == 1:
+                break
+        print("==== Time: {}".format(date_time))
     except Exception as err:
         print("**********Connection Request Failed**********")
         print('Failed to upload to ftp: {}'.format(err))
@@ -142,14 +153,15 @@ def getAllComment(list, filename):
         counter += 1
         # if counter == 1:
         #    continue
-
         print("debug2: " + link)
+        pageNum = link.split('=')[-1]
         try:
-            getComment(link, file)
+            getFirstCommentTime(link, file, pageNum)
         except Exception as e:
             print("**********Please Restart the Program**********")
             break
         time.sleep(1)
+    print("Total Page: {}".format(counter))
     file.close()
 
 
@@ -202,11 +214,6 @@ def path_change(filename):
 
 def use_reading():
     print("******************************************************************************")
-    print("*                                使用必读                                    *")
-    print("*                                一般来说每写入100个链接大约耗时18s            *")
-    print("*                                如果转发链接大于1w条，请耐心等待            *")
-    print("*                                使用前请耐心阅读使用文档                    *")
-    print("*****************************************************************************")
 
 
 if __name__ == '__main__':
