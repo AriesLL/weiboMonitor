@@ -14,10 +14,10 @@ page = 'https://weibo.cn'  # 简易版微博首页地址
 main_page = 'https://weibo.com'  # 正式版微博首页地址
 comment_page = 'https://weibo.cn/repost/'  # 简易版微博评论页面地址
 # 请登录帐号查找自己的cookie填入此处
-cook = {"Cookie": ""}
+cook = {"Cookie": "H5_INDEX_TITLE=^%^E5^%^90^%^B4^%^E5^%^B8^%^B8^%^E8^%^AF^%^86; SCF=Aiu2eo2z4qdQQJrBggF8yE1oSInj9XDzeOoQLztb-BqVv-IHxpvg6Q7Bgh9EE-KMkgcQOzV2v5N0hORj6i4yZ4w.; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWGc.ZyBp14bO1eIRIj-YJ25JpX5K-hUgL.Fo2pSK5Neh.Ne0M2dJLoIpjLxK-L1K5LBoBLxK-LBonLBonLxKnLB-qL1hqt; _T_WM=cec6c7e53b9d17d436ff4c659aae9219; H5_INDEX=2; SUB=_2A252OuZpDeRhGeBL7FAX8yfPwzyIHXVVxIohrDV6PUJbkdBeLW6jkW1NRvRfX5mWDtrc-awpzg8qLarSDQZdFytn; SUHB=08Jr01Do0ytQUZ; SSOLoginState=1530828345"}
 
 
-def findPage(file, linkWithoutNum, lastfoundPageNum, Hour, Minute):
+def findPage(file, linkWithoutNum, lastfoundPageNum, Hour, Minute, totalpage):
     curNum = lastfoundPageNum + 500
     pageFound = False
     stack = 20
@@ -33,7 +33,7 @@ def findPage(file, linkWithoutNum, lastfoundPageNum, Hour, Minute):
                 soup = BeautifulSoup(html, "html.parser")
                 r = soup.findAll('div', attrs={"class": "c"})
 
-                if len(r) > 3:
+                if len(r) > 5:
                     reloadstack = 0
                     for e in r:
                         for item in e.find_all('span', attrs={"class": "ct"}):
@@ -55,9 +55,10 @@ def findPage(file, linkWithoutNum, lastfoundPageNum, Hour, Minute):
                                 pageFound = True
                                 try:
                                     # file.write(link + '\n')
-                                    file.write("[{}] {} page:{}\n".format(
+                                    file.write("[{}]  {}  UP:{}  page:{}\n".format(
                                         repo_time,
-                                        int((45127 - curNum) * 10),
+                                        int((totalpage - curNum) * 10),
+                                        int((curNum - lastfoundPageNum) * 10),
                                         int(curNum)
                                     ))
                                     return curNum
@@ -133,7 +134,7 @@ def getAllIncrements(filename, url):
     lastfoundPageNum = 1
     while hour >= 0:
         try:
-            lastfoundPageNum = int(findPage(file, linkWithoutNum, lastfoundPageNum, hour, minute))
+            lastfoundPageNum = int(findPage(file, linkWithoutNum, lastfoundPageNum, hour, minute, int(e)))
             if(minute == 30):
                 minute = 0
             else:
@@ -182,7 +183,7 @@ def getTreeComment(input_file_name, output_file_name):
         print(link)
         i = i + 1
         print("**********************Writing the " + str(i) + "th file, Please Wait***************************")
-        getAllIncrements(output_file_name + '_file_' + str(i) + '_startpos_' + str(start_pos) + '.txt', link)
+        getAllIncrements(output_file_name + '.txt', link)
         # getAllComment(getUrlList(link, start_pos), output_file_name + '_file_' + str(i) + '_startpos_' + str(start_pos) + '.txt')
         print("**********************The " + str(i) + "th file, Write Complete*********************************")
     total_time = time.time() - start
@@ -204,5 +205,4 @@ if __name__ == '__main__':
     output_file_name = r"./output.txt"
     input_file_name = sys.argv[1]
     output_file_name = sys.argv[2]
-    start_pos = int(sys.argv[3])
     getTreeComment(input_file_name, output_file_name)
