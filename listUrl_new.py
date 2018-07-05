@@ -14,7 +14,7 @@ page = 'https://weibo.cn'  # 简易版微博首页地址
 main_page = 'https://weibo.com'  # 正式版微博首页地址
 comment_page = 'https://weibo.cn/repost/'  # 简易版微博评论页面地址
 # 请登录帐号查找自己的cookie填入此处
-cook = {"Cookie": "SCF=AsdcgVF2NbIsbWvmWhPdBQiAYJrHzSznn-Yd7Ropjdul1VirhlewfJl-Pb1NL17YKJ6c6JuOC7S5GGzbSPlKYR8.; _T_WM=7e7fb5d90f9d9dad26c9d01980b03345; MLOGIN=1; SUB=_2A252OkLTDeRhGeBL7FAX8yfPwzyIHXVVxW6brDV6PUJbkdBeLRPAkW1NRvRfX3E1cKMspwfYMi89mk6SA7PcYZmU; SUHB=0FQ7u54fxnl6K_; M_WEIBOCN_PARAMS=luicode^%^3D10000011^%^26lfid^%^3D231219_2793_newartificial_1001"}
+cook = {"Cookie": ""}
 
 
 def getUrlList(url, start_pos):
@@ -23,12 +23,12 @@ def getUrlList(url, start_pos):
     :param url: 主页面链接
     :return: 所有评论链接
     """
-    # print("debug Url: "+url)
+    #print("debug Url: "+url)
     form_action = url
     url = comment_page + url
-    # print("debug url: "+url)
+    #print("debug url: "+url)
     html = requests.get(url, cookies=cook).content
-    # print("debug ==========:")
+    #print("debug ==========:")
     # print(html)
 
     soup = BeautifulSoup(html, "html.parser")
@@ -48,7 +48,7 @@ def getUrlList(url, start_pos):
     for i in range(start_pos, end_pos):
         # if (i >= start_pos) and (i <= (start_pos+2)) :
         list.append(page + b + str(i))
-        # print("debug list:"+ page +b + str(i))
+        #print("debug list:"+ page +b + str(i))
     return list
 
 
@@ -58,9 +58,11 @@ def getComment(url, file):
     :param url:评论页面链接
     :param file: 文件对象
     """
+    #print("debug Here")
     try:
         html = requests.get(url, cookies=cook).content
         # print(html)
+        #print("debug html in getComment: "+html)
         soup = BeautifulSoup(html, "html.parser")
         r = soup.findAll('div', attrs={"class": "c"})
         counter = 0
@@ -108,7 +110,7 @@ def getComment(url, file):
                 # print(repostText)
                 counter += 1
                 try:
-                    # file.write(link + '\n')
+                    #file.write(link + '\n')
                     file.write("{},{},{},{}\n".format(
                         date_time,
                         uid,
@@ -123,10 +125,10 @@ def getComment(url, file):
                 # print("detail")
                 # print(item)
                 # print(item.text)
-        print("Total Lines: {}".format(counter))
-    except Exception as err:
-        print("**********Connection Request Failed**********")
-        print('Failed to upload to ftp: {}'.format(err))
+        print(counter)
+    except Exception as e:
+        print("**********请求连接失败**********")
+        print('Failed to upload to ftp: ' + str(e))
         raise Exception()
 
 
@@ -147,7 +149,7 @@ def getAllComment(list, filename):
         try:
             getComment(link, file)
         except Exception as e:
-            print("**********Please Restart the Program**********")
+            print("**********请重新运行程序**********")
             break
         time.sleep(1)
     file.close()
@@ -161,8 +163,8 @@ def readFile(filename):
     """
     list = []
     if not os.path.isfile(filename):
-        print("*******************File doesn't exist*******************")
-        raise Exception("*******************File doesn't exist*******************")
+        print("*******************文件不存在请检查文件是否存在*******************")
+        raise Exception("*******************文件不存在请检查文件是否存在*******************")
         return
     file = open(filename)
     lines = file.readlines()  # 调用文件的 readline()方法
@@ -180,7 +182,7 @@ def getTreeComment(input_file_name, output_file_name):
     :param output_file_name:输入文件
     """
     start = time.time()
-    print("-----------Time Countdown Starts-----------")
+    print("-----------计时开始-----------")
     output_file_name = path_change(output_file_name)
     i = 0
     tree_list = readFile(input_file_name)
@@ -188,11 +190,11 @@ def getTreeComment(input_file_name, output_file_name):
     for link in tree_list:
         print(link)
         i = i + 1
-        print("**********************Writing the " + str(i) + "th file, Please Wait***************************")
+        print("**********************写入第" + str(i) + "个文件，请耐心等待***************************")
         getAllComment(getUrlList(link, start_pos), output_file_name + '_file_' + str(i) + '_startpos_' + str(start_pos) + '.txt')
-        print("**********************The " + str(i) + "th file, Write Complete*********************************")
+        print("**********************第" + str(i) + "个文件，写入完毕*********************************")
     total_time = time.time() - start
-    print(u"-----------Total time spent: %f seconds-----------" % total_time)
+    print(u"-----------总共耗时：%f 秒-----------" % total_time)
 
 
 def path_change(filename):

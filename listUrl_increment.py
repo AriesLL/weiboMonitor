@@ -14,7 +14,7 @@ page = 'https://weibo.cn'  # 简易版微博首页地址
 main_page = 'https://weibo.com'  # 正式版微博首页地址
 comment_page = 'https://weibo.cn/repost/'  # 简易版微博评论页面地址
 # 请登录帐号查找自己的cookie填入此处
-cook = {"Cookie": "SCF=AsdcgVF2NbIsbWvmWhPdBQiAYJrHzSznn-Yd7Ropjdul1VirhlewfJl-Pb1NL17YKJ6c6JuOC7S5GGzbSPlKYR8.; _T_WM=7e7fb5d90f9d9dad26c9d01980b03345; MLOGIN=1; SUB=_2A252OkLTDeRhGeBL7FAX8yfPwzyIHXVVxW6brDV6PUJbkdBeLRPAkW1NRvRfX3E1cKMspwfYMi89mk6SA7PcYZmU; SUHB=0FQ7u54fxnl6K_; M_WEIBOCN_PARAMS=luicode^%^3D10000011^%^26lfid^%^3D231219_2793_newartificial_1001"}
+cook = {"Cookie": ""}
 
 
 def findPage(file, linkWithoutNum, lastfoundPageNum, Hour, Minute):
