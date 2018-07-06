@@ -7,20 +7,22 @@ import re
 import time
 import os
 import traceback
-
+import math
 
 # ***********基本信息请谨慎更改**********
 page = 'https://weibo.cn'  # 简易版微博首页地址
 main_page = 'https://weibo.com'  # 正式版微博首页地址
 comment_page = 'https://weibo.cn/repost/'  # 简易版微博评论页面地址
 # 请登录帐号查找自己的cookie填入此处
-cook = {"Cookie": "H5_INDEX_TITLE=^%^E5^%^90^%^B4^%^E5^%^B8^%^B8^%^E8^%^AF^%^86; SCF=Aiu2eo2z4qdQQJrBggF8yE1oSInj9XDzeOoQLztb-BqVv-IHxpvg6Q7Bgh9EE-KMkgcQOzV2v5N0hORj6i4yZ4w.; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWGc.ZyBp14bO1eIRIj-YJ25JpX5K-hUgL.Fo2pSK5Neh.Ne0M2dJLoIpjLxK-L1K5LBoBLxK-LBonLBonLxKnLB-qL1hqt; _T_WM=cec6c7e53b9d17d436ff4c659aae9219; H5_INDEX=2; SUB=_2A252OuZpDeRhGeBL7FAX8yfPwzyIHXVVxIohrDV6PUJbkdBeLW6jkW1NRvRfX5mWDtrc-awpzg8qLarSDQZdFytn; SUHB=08Jr01Do0ytQUZ; SSOLoginState=1530828345"}
+cook = {"Cookie": "H5_INDEX_TITLE=^%^E5^%^90^%^B4^%^E5^%^B8^%^B8^%^E8^%^AF^%^86; _T_WM=cec6c7e53b9d17d436ff4c659aae9219; H5_INDEX=2; ALF=1533427836; SCF=Aiu2eo2z4qdQQJrBggF8yE1oSInj9XDzeOoQLztb-BqVNThMrgxsaBYpqgPmfiKD9c0v_tuK2jzS2KDCJ3IFyLk.; SUB=_2A252OsPfDeRhGeBL7FAX8yfPwzyIHXVVxO2XrDV6PUJbktBeLULbkW1NRvRfX4kes_xdU9uhUFvD7VmKUKvyjPiu; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWI6sZbKfCdcTDFjg5qBbvZ5JpX5K-hUgL.FoqfS0zce0.01h52dJLoI7_TC-4G-2vPeo5pS5tt; SUHB=06ZVu7AawW5M80; SSOLoginState=1530835855"}
 
 
 def findPage(file, linkWithoutNum, lastfoundPageNum, Hour, Minute, totalpage):
+    print("=======================================================")
+    print("================== LOOKING FOR {}:{} ==================".format(Hour, Minute))
     curNum = lastfoundPageNum + 500
     pageFound = False
-    stack = 20
+    stack = 40
 
     try:
         offset = 500
@@ -37,8 +39,17 @@ def findPage(file, linkWithoutNum, lastfoundPageNum, Hour, Minute, totalpage):
                     reloadstack = 0
                     for e in r:
                         for item in e.find_all('span', attrs={"class": "ct"}):
+
                             repo_info = item.text
                             repo_time = re.findall("\d+:\d+", repo_info)
+                            repo_date = re.findall("\d+月\d+日", repo_info)
+                            if len(repo_date) != 0:
+                                repo_date = repo_date[0]
+                            else:
+                                if len(re.findall("今天", repo_info)) != 0:
+                                    repo_date = "今天"
+                                else:
+                                    break
                             if len(repo_time) != 0:
                                 repo_time = repo_time[0]
                             else:
@@ -69,7 +80,19 @@ def findPage(file, linkWithoutNum, lastfoundPageNum, Hour, Minute, totalpage):
                         print('Not found')
                         print("## Time: {}:{}".format(curHour, curMinute))
                         print("## Page: {}".format(curNum))
-                        if Minute == 0:
+                        if curNum <= 1:
+                            offset = (1 - curNum) + 5
+                        elif repo_date == "今天":
+                            if offset < 0:
+                                offset *= -0.5
+                            else:
+                                offset = 100
+                        elif int(repo_date.split("月")[1].split("日")[0]) != 4:
+                            if offset < 0:
+                                offset *= -0.5
+                            else:
+                                offset = 100
+                        elif Minute == 0:
                             if curHour > Hour:
                                 offset = 500
                             elif curHour == Hour:
@@ -78,17 +101,18 @@ def findPage(file, linkWithoutNum, lastfoundPageNum, Hour, Minute, totalpage):
                             elif curHour < Hour:
                                 if offset > 0:
                                     offset *= -0.5
-                        if Minute == 30:
+                        else:
                             if curHour > Hour:
-                                offset = 500
+                                if offset < 0:
+                                    offset *= -0.5
                             elif curHour < Hour:
                                 if offset > 0:
-                                    offset = -500
+                                    offset *= -0.5
                             elif curHour == Hour:
-                                if curMinute > 30:
+                                if curMinute > Minute:
                                     if offset < 0:
                                         offset *= -0.5
-                                if curMinute < 30:
+                                if curMinute < Minute:
                                     if offset > 0:
                                         offset *= -0.5
                 else:
@@ -97,10 +121,11 @@ def findPage(file, linkWithoutNum, lastfoundPageNum, Hour, Minute, totalpage):
                     if reloadstack == 0:
                         print("**********Loaded page {} too many times**********".format(curNum))
                         raise Exception()
-
+            offset = math.ceil(offset)
             print("## offset: {}\n".format(offset))
             curNum = int(curNum + offset)
             stack -= 1
+            time.sleep(1)
         return curNum
     except Exception as err:
         print("**********Connection Request Failed**********")
@@ -135,11 +160,11 @@ def getAllIncrements(filename, url):
     while hour >= 0:
         try:
             lastfoundPageNum = int(findPage(file, linkWithoutNum, lastfoundPageNum, hour, minute, int(e)))
-            if(minute == 30):
-                minute = 0
-            else:
-                minute = 30
+            if minute == 0:
+                minute = 55
                 hour -= 1
+            else:
+                minute -= 5
             time.sleep(1)
         except Exception as e:
             print("**********Please Restart the Program**********")
