@@ -1,4 +1,4 @@
- weiboMonitor
+weiboMonitor
 
 reference: https://blog.csdn.net/acsyl/article/details/78189042
 
@@ -35,3 +35,7 @@ https://weibo.cn/repost/GmUmH32r2?page=3 to https://weibo.cn/repost/GmUmH32r2?pa
 
 output has 4 fields, 
 date_time, UID, nickname, repost_text
+
+To add:
+
+scripts to monitor current repost (done, not uploaded yet)
