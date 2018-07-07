@@ -23,7 +23,7 @@ page = 'https://weibo.cn'  # 简易版微博首页地址
 main_page = 'https://weibo.com'  # 正式版微博首页地址
 comment_page = 'https://weibo.cn/repost/'  # 简易版微博评论页面地址
 # 请登录帐号查找自己的cookie填入此处
-cook = {"Cookie": "_T_WM=cec6c7e53b9d17d436ff4c659aae9219; H5_INDEX_TITLE=KINGPOW2014; H5_INDEX=1; MLOGIN=1; WEIBOCN_WM=4209_8001; M_WEIBOCN_PARAMS=sourceType^%^3Dqq^%^26featurecode^%^3Dnewtitle^%^26oid^%^3D4256012015267881^%^26luicode^%^3D20000061^%^26lfid^%^3D4256012015267881; ALF=1533516434; SCF=Aiu2eo2z4qdQQJrBggF8yE1oSInj9XDzeOoQLztb-BqVQJVLRswVR5BhrT08vzb_97F45tZPYK0M-HzxlnCwBNo.; SUB=_2A252RH34DeRhGeBL41sW9y7FzjmIHXVVxwOwrDV6PUJbktBeLUvxkW1NRtBnv6G-WJsmb6aTuf-72OOp5MI5oAUw; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWaXCfnNLfZ_8xY.Ph8mVCa5JpX5K-hUgL.Foqf1h.NS054SK-2dJLoIEQLxKBLBonL1h5LxK.LBo.LB.qLxKqL1-eL1h.LxKBLB.BLBKWk9s8N9g.t; SUHB=0mxE1sARGbkmr1; SSOLoginState=1530924457"}
+cook = {"Cookie": "_T_WM=cec6c7e53b9d17d436ff4c659aae9219; H5_INDEX_TITLE=KINGPOW2014; H5_INDEX=1; WEIBOCN_WM=4209_8001; SCF=Aiu2eo2z4qdQQJrBggF8yE1oSInj9XDzeOoQLztb-BqVbFLcl2bZDJ-fKiA3P4SS2gYG50Qpaz9aH9SJrLnvl-4.; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWTxu2Rx7O1G70ONvMfQm4c5JpX5K-hUgL.Foqf1h.ceK2X1K22dJLoIEzLxKqL1h.LB.qLxKnLB-zLB.-LxK-LBKBLB-8kCJv4BcHk; SUB=_2A252RKpMDeRhGeBL4lIQ8C7PyD6IHXVVxjYErDV6PUJbkdBeLU_ekW1NRtHKJRtmqKzv5of1FChwBepx9zG5vuc5; SUHB=0N2lQGJ5tyT70z; SSOLoginState=1530976796"}
 
 ###############################################################################
 # main
@@ -73,19 +73,36 @@ def getTreeComment(input_file_name):
         #getAllComment(getUrlList(link, start_pos),output_file_name +'_file_'+ str(i) +'_startpos_'+str(start_pos) +'_batchNum_'+str(batchNum)+'.txt')
         repostCount = getUrlListCount(link)
         # file.write("{},{}\n".format(timeTag, repostCount))
-        data = {
-            'Time': timeTag,
-            'repostCount': repostCount
-        }
         if i == 0:
+            last_count = zn.find().sort('_id', -1).limit(1)[0]['repostCount']
+            increment = repostCount - last_count
+            data = {
+                'Time': sh_time,
+                'repostCount': repostCount,
+                'repostIncrement': increment
+            }
             zn.insert_one(data)
-            print("----------- ZN [{}] {} -----------".format(timeTag, repostCount))
+            print("----------- ZN [{}] {} {} -----------".format(timeTag, repostCount, increment))
         elif i == 1:
+            last_count = lmy.find().sort('_id', -1).limit(1)[0]['repostCount']
+            increment = repostCount - last_count
+            data = {
+                'Time': sh_time,
+                'repostCount': repostCount,
+                'repostIncrement': increment
+            }
             lmy.insert_one(data)
-            print("----------- LMY [{}] {} -----------".format(timeTag, repostCount))
+            print("----------- LMY [{}] {} {} -----------".format(timeTag, repostCount, increment))
         elif i == 2:
+            last_count = ycy.find().sort('_id', -1).limit(1)[0]['repostCount']
+            increment = repostCount - last_count
+            data = {
+                'Time': sh_time,
+                'repostCount': repostCount,
+                'repostIncrement': increment
+            }
             ycy.insert_one(data)
-            print("----------- YCY [{}] {} -----------".format(timeTag, repostCount))
+            print("----------- YCY [{}] {} {} -----------".format(timeTag, repostCount, increment))
         i = i + 1
         time.sleep(1)
         #print("**********************第" + str(i) + "个文件，写入完毕*********************************")
