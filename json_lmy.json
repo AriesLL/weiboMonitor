@@ -1,0 +1,45 @@
+[
+    {
+      "time": "23:00",
+      "num_repost": 1506140,
+      "num_repost_increment": 7820,
+      "pageNum": 12782
+    },
+    {
+      "time": "22:55",
+      "num_repost": 1505200,
+      "num_repost_increment": 940,
+      "pageNum": 12876
+    },
+    {
+      "time": "22:50",
+      "num_repost": 1503950,
+      "num_repost_increment": 1250,
+      "pageNum": 13001
+    },
+    {
+      "time": "22:45",
+      "num_repost": 1501820,
+      "num_repost_increment": 2130,
+      "pageNum": 13214
+    },
+    {
+      "time": "22:40",
+      "num_repost": 1499630,
+      "num_repost_increment": 2190,
+      "pageNum": 13433
+    },
+    {
+      "time": "22:35",
+      "num_repost": 1497900,
+      "num_repost_increment": 1730,
+      "pageNum": 13606
+    },
+    {
+      "time": "22:30",
+      "num_repost": 1495400,
+      "num_repost_increment": 2500,
+      "pageNum": 13856
+    }
+]
+

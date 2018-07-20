@@ -8,16 +8,17 @@ import time
 import os
 import traceback
 import math
+import json
 
 # ***********基本信息请谨慎更改**********
 page = 'https://weibo.cn'  # 简易版微博首页地址
 main_page = 'https://weibo.com'  # 正式版微博首页地址
 comment_page = 'https://weibo.cn/repost/'  # 简易版微博评论页面地址
 # 请登录帐号查找自己的cookie填入此处
-cook = {"Cookie": "H5_INDEX_TITLE=^%^E5^%^90^%^B4^%^E5^%^B8^%^B8^%^E8^%^AF^%^86; _T_WM=cec6c7e53b9d17d436ff4c659aae9219; H5_INDEX=2; ALF=1533427836; SCF=Aiu2eo2z4qdQQJrBggF8yE1oSInj9XDzeOoQLztb-BqVNThMrgxsaBYpqgPmfiKD9c0v_tuK2jzS2KDCJ3IFyLk.; SUB=_2A252OsPfDeRhGeBL7FAX8yfPwzyIHXVVxO2XrDV6PUJbktBeLULbkW1NRvRfX4kes_xdU9uhUFvD7VmKUKvyjPiu; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWI6sZbKfCdcTDFjg5qBbvZ5JpX5K-hUgL.FoqfS0zce0.01h52dJLoI7_TC-4G-2vPeo5pS5tt; SUHB=06ZVu7AawW5M80; SSOLoginState=1530835855"}
+cook = {"Cookie": "_T_WM=cec6c7e53b9d17d436ff4c659aae9219; H5_INDEX_TITLE=KINGPOW2014; H5_INDEX=1; MLOGIN=1; WEIBOCN_WM=4209_8001; M_WEIBOCN_PARAMS=sourceType^%^3Dqq^%^26featurecode^%^3Dnewtitle^%^26oid^%^3D4256012015267881^%^26luicode^%^3D20000061^%^26lfid^%^3D4256012015267881; ALF=1533516434; SCF=Aiu2eo2z4qdQQJrBggF8yE1oSInj9XDzeOoQLztb-BqVQJVLRswVR5BhrT08vzb_97F45tZPYK0M-HzxlnCwBNo.; SUB=_2A252RH34DeRhGeBL41sW9y7FzjmIHXVVxwOwrDV6PUJbktBeLUvxkW1NRtBnv6G-WJsmb6aTuf-72OOp5MI5oAUw; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWaXCfnNLfZ_8xY.Ph8mVCa5JpX5K-hUgL.Foqf1h.NS054SK-2dJLoIEQLxKBLBonL1h5LxK.LBo.LB.qLxKqL1-eL1h.LxKBLB.BLBKWk9s8N9g.t; SUHB=0mxE1sARGbkmr1; SSOLoginState=1530924457"}
 
 
-def findPage(file, linkWithoutNum, lastfoundPageNum, Hour, Minute, totalpage):
+def findPage(data, linkWithoutNum, lastfoundPageNum, Hour, Minute, totalpage):
     print("=======================================================")
     print("================== LOOKING FOR {}:{} ==================".format(Hour, Minute))
     curNum = lastfoundPageNum + 500
@@ -65,19 +66,25 @@ def findPage(file, linkWithoutNum, lastfoundPageNum, Hour, Minute, totalpage):
                                 print('!!!!!!!! FOUND !!!!!!!! {}:{} at [{}]\n'.format(Hour, Minute, int(curNum)))
                                 pageFound = True
                                 try:
-                                    # file.write(link + '\n')
-                                    file.write("[{}]  {}  UP:{}  page:{}\n".format(
-                                        repo_time,
-                                        int((totalpage - curNum) * 10),
-                                        int((curNum - lastfoundPageNum) * 10),
-                                        int(curNum)
-                                    ))
+                                    data['increment_per_5min'].append({
+                                        'time': repo_time,
+                                        'num_repost': int((totalpage - curNum) * 10),
+                                        'num_repost_increment': int((curNum - lastfoundPageNum) * 10),
+                                        'pageNum': int(curNum)
+                                    })
+                                    # file.write("[{}]  {}  UP:{}  page:{}\n".format(
+                                    #     repo_time,
+                                    #     int((totalpage - curNum) * 10),
+                                    #     int((curNum - lastfoundPageNum) * 10),
+                                    #     int(curNum)
+                                    # ))
                                     return curNum
                                 except IOError:
                                     print("存入目标文件有误，请重新选择文件")
                                     raise IOError("存入目标文件有误，请重新选择文件")
                     if pageFound == False:
                         print('Not found')
+                        print("## Date: {}".format(repo_date))
                         print("## Time: {}:{}".format(curHour, curMinute))
                         print("## Page: {}".format(curNum))
                         if curNum <= 1:
@@ -87,7 +94,7 @@ def findPage(file, linkWithoutNum, lastfoundPageNum, Hour, Minute, totalpage):
                                 offset *= -0.5
                             else:
                                 offset = 100
-                        elif int(repo_date.split("月")[1].split("日")[0]) != 4:
+                        elif int(repo_date.split("月")[1].split("日")[0]) != 6:
                             if offset < 0:
                                 offset *= -0.5
                             else:
@@ -152,14 +159,16 @@ def getAllIncrements(filename, url):
     linkWithoutNum = page + b
 
     bufsize = 0
-    file = codecs.open(filename, mode="w", encoding="utf-8", buffering=bufsize)
+    # file = codecs.open(filename, mode="w", encoding="utf-8", buffering=bufsize)
+    data = {}
+    data['increment_per_5min'] = []
 
-    hour = 22
+    hour = 23
     minute = 0
-    lastfoundPageNum = 1
-    while hour >= 0:
+    lastfoundPageNum = 12000
+    while (hour != 22 or minute != 25):
         try:
-            lastfoundPageNum = int(findPage(file, linkWithoutNum, lastfoundPageNum, hour, minute, int(e)))
+            lastfoundPageNum = int(findPage(data, linkWithoutNum, lastfoundPageNum, hour, minute, int(e)))
             if minute == 0:
                 minute = 55
                 hour -= 1
@@ -169,7 +178,9 @@ def getAllIncrements(filename, url):
         except Exception as e:
             print("**********Please Restart the Program**********")
             break
-    file.close()
+    with open(filename, 'w') as outfile:
+        json.dump(data, outfile)
+    # file.close()
 
 
 def readFile(filename):

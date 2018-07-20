@@ -23,7 +23,7 @@ page = 'https://weibo.cn'  # 简易版微博首页地址
 main_page = 'https://weibo.com'  # 正式版微博首页地址
 comment_page = 'https://weibo.cn/repost/'  # 简易版微博评论页面地址
 # 请登录帐号查找自己的cookie填入此处
-cook = {"Cookie": "_T_WM=cec6c7e53b9d17d436ff4c659aae9219; H5_INDEX_TITLE=KINGPOW2014; H5_INDEX=1; WEIBOCN_WM=4209_8001; SCF=Aiu2eo2z4qdQQJrBggF8yE1oSInj9XDzeOoQLztb-BqVbFLcl2bZDJ-fKiA3P4SS2gYG50Qpaz9aH9SJrLnvl-4.; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWTxu2Rx7O1G70ONvMfQm4c5JpX5K-hUgL.Foqf1h.ceK2X1K22dJLoIEzLxKqL1h.LB.qLxKnLB-zLB.-LxK-LBKBLB-8kCJv4BcHk; SUB=_2A252RKpMDeRhGeBL4lIQ8C7PyD6IHXVVxjYErDV6PUJbkdBeLU_ekW1NRtHKJRtmqKzv5of1FChwBepx9zG5vuc5; SUHB=0N2lQGJ5tyT70z; SSOLoginState=1530976796"}
+cook = {"Cookie": "_T_WM=cec6c7e53b9d17d436ff4c659aae9219; H5_INDEX_TITLE=KINGPOW2014; H5_INDEX=1; WEIBOCN_WM=9021_0002; ALF=1533652701; SCF=Aiu2eo2z4qdQQJrBggF8yE1oSInj9XDzeOoQLztb-BqVlkKYqnehpV3MX7lRo6qLAU3KyqUwjllaRBwMv8lFsyY.; SUB=_2A252RlJXDeRhGeBL41sX8S_Iwj2IHXVVyX4frDV6PUJbktBeLVf7kW1NRtEtIxzD4phpoxEGh3fL97CTR3y3N0ui; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWTxu2Rx7O1G70ONvMfQm4c5JpX5K-hUgL.Foqf1h.ceK2X1K22dJLoIEzLxKqL1h.LB.qLxKnLB-zLB.-LxK-LBKBLB-8kCJv4BcHk; SUHB=0mxE1tS42b78SY; SSOLoginState=1531060743"}
 
 ###############################################################################
 # main

@@ -33,7 +33,7 @@ def getUrlListCount(url):
     html = requests.get(url, cookies=cook).content
     #print("debug ==========:")
     #print(html)
-    
+
     soup = BeautifulSoup(html, "html.parser")
     list = []
     form = soup.find("form", attrs={"action": "/repost/" + form_action})
@@ -92,7 +92,7 @@ def getComment(url,file):
                 date_time=repo_date+repo_time
 
             if size == 2:
-                repostText=(e.text) 
+                repostText=(e.text)
 
                 repostText=(repostText.replace(',','delimiterTag'))
                 #print(repostText)
@@ -110,7 +110,7 @@ def getComment(url,file):
                         name,
                         repostText
                         ))
-                        
+
                 except IOError:
                     print("存入目标文件有误，请重新选择文件")
                     raise IOError("存入目标文件有误，请重新选择文件")
@@ -210,7 +210,7 @@ if __name__ == '__main__':
     input_file_name = sys.argv[1]
     output_file_name = sys.argv[2]
     #start_pos = int(sys.argv[3])
-    #batchNum=int(sys.argv[4]) 
+    #batchNum=int(sys.argv[4])
     #print(start_pos)
     #print(str(datetime.now()))
     shanghai= timezone('Asia/Shanghai')
